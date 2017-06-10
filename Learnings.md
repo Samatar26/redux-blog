@@ -20,3 +20,20 @@ Since we are already reflecting the id of the post we are looking at inside of t
 We can take the posts property and look at id inside the url and use these two pieces of state/information to decide which post to render to the screen. That's step 1.
 
 The other change is that it might make more sense to store our list of posts inside of an object, rather than an array. The Key will be the id of the post and the value will be the post itself. This will make it easier for us to find a particular post. If our posts were stored inside of an array we would have to use a for loop and map through our posts to look for the matching post based on id. Whereas with an object, we could do something as simple as `state.posts[postId]`. We pull the postId directly from the url.
+
+
+Lodash has a method called `_.mapKeys(array, object property)` which makes it really easy to turn an array of objects into an object where the keys are the postids. MapKeys' first argument expects an array and the second argument is the property we want to pull off of each object to use as the key of the resulting object.
+
+### Shortcut Action creator
+
+In the past we've made use of the connect helper by defining the mapDispatchToProps function whenever we wanted to get action creator directly into our component so we can call it of the props object.
+There's another way, which is a shortcut to define our action creator, like so:
+
+```js
+export default connect(null, { fetchPosts })(PostsIndex);
+
+```
+
+It is completely identical to the way we used to call it before with the mapDispatchToProps function. There are times you want to use the mapDispatchToProps, like when you want to do some computation on exactly how you want to call the action creator ahead of time. _**connect is taking care of that extra step of binding the dispatch function for us behind the scenes**_.
+
+We'll make use of the `componentDidMount` lifecycle method to fetch our posts. This function will automatically be called by React as soon as the component has been rendered to the DOM. You might wonder why we're fetching our data _after_ the component has mounted. Fetching data is an asynchronous operation, fetching data from an api takes some time and React will not wait for the operation to be finished to render the component. Even if we call it within `componentWillMount` the component will render before the data has been retrieved.
