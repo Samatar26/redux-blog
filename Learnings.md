@@ -354,3 +354,40 @@ export function createPost(values, cb) {
 
 
 ```
+
+We should always assume that the user can enter into your application on any given page. Therefore the postsShow component needs to be responsible for fetching its own data. We need access to the id, the token inside the url, which is a very important piece of state that dictates how our component will behave. We can access this by using `this.props.match.params` which is provided by us by reac-router. The params object gives us access to all of the different wildcards inside of our url.
+
+### Selecting from ownProps
+The mapStateToProps has a second argument which is referred to as ownProps. It's the props object that is headed, going to the component. Therefore whenever PostsShow is rerendered or about to be rerendered, mapStateToProps is passed all the props that are headed to postsShow. Therefore rather than returning the big lists of posts, we can return the single post we care about. You might think, what's the difference since we're still dealing with the massive posts object in our mapStateToProps function. Well there is a difference as in many large applications, your mapStateToProps function would be in a completely different file. This makes your component way more reusable. It also helps to clean up your component. 
+
+```js
+import React, { Component } from 'react';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import { fetchPost } from './../actions/index.js';
+
+class PostsShow extends Component {
+  componentDidMount() {
+    const { id } = this.props.match.params;
+    this.props.fetchPost(id);
+  }
+
+  render() {
+    return (
+      <div>
+        Ga
+      </div>
+    );
+  }
+}
+
+const mapStateToProps = ({ posts }, ownProps) => {
+  return { post: posts[ownProps.match.params.id] };
+};
+export default connect(mapStateToProps, { fetchPost })(PostsShow);
+
+
+```
+
+Note: You can pass in variables for keys by wrapping it in square braces, like so:
+`return { ...state, [action.payload.id]: action.payload };`
