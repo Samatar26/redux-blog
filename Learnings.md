@@ -223,8 +223,8 @@ The field will call the function we pass into component which will return some a
 
 You can pass arbitrary properties to the Field component which will be passed on into the field argument inside our renderField function.
 
-When validating our form submission, we hook into our reduxForm system validation. The first thing we do is define a helper function called validate and we pass in this function as a configuration option called validate. This validation function is automatically called whenever the user tries to submit the form. The function is given a single argument which is called values by convention, this is an object which contains all of the different values that a user has entered into the form. e.g. for us 
-`{title: 'aaa', categories: 'diada', content: 'dada'}`. In order to validate these inputs and communicate any possible errors back to redux form, we have to return an object that we create from the validate function. So we start off by creating an errors object, which is empty initially. If we return an empty object, redux form assumes there aren't any errors and the form is valid. If any properties are appended to the errors object, the form is invalid.
+When validating our form submission, we hook into our reduxForm system validation. The first thing we do is define a helper function called validate and we pass in this function as a configuration option called validate. This validation function is automatically called whenever the user tries to submit the form. The function is given a single argument which is called values by convention, this is an object which contains all of the different values that a user has entered into the form. e.g. for us
+`{title: 'aaa', categories: 'diada', content: 'dada'}`. In order to validate these inputs and communicate any possible errors back to redux form, we have to return an object that we create from the validate function. So we start off by creating an errors object, which is empty initially. If we return an empty object, redux form assumes there aren't any errors and the form is valid. If any properties are appended to the errors object, the form is invalid. the name property and the property we use within the validate function must be identical for the error to show up. The error can be accessed inside our renderField function using `{field.meta.error}`. This will return a string which is the exact same string we provided in our validate function.
 
 ```js
 import React, { Component } from 'react';
@@ -253,6 +253,7 @@ class PostsNew extends Component {
           label="Post content"
           component={this.renderField}
         />
+        {field.meta.error}
 
       </form>
     );
@@ -278,7 +279,35 @@ export default reduxForm({
 })(PostsNew);
 
 
-```
 
 
 ```
+
+#### Handling Form submittal
+Redux form does not handle like posting the data from our form to a backend server. We want to involve Redux-Form with our onsubmit, but we also need to interject some of our own custom logic as well for taking those values and doing something interesting with them. Redux form is only responsible for handling the state and validation of our form. It is not responsible for handling anything like making a post request or saving the data. Therefore handleSubmit, takes a function we define and we pass it to handleSubmit and handleSubmit runs the redux form side of things like validation, etc. When everything's okay and ready to submit, it calls the function we defined and gives us the value out of the form for us to work on.
+
+```js
+
+onSubmit = values => {
+  console.log(values);
+};
+
+render() {
+  const { handleSubmit } = this.props;
+  return (
+    <form onSubmit={handleSubmit(this.onSubmit)}>
+```
+
+
+There are 3 different states of our form for each and every field we create for our form.
+- pristine
+This is the state how every single input is rendered by default. No input has touched it yet, and the user has not yet selected it.
+- touched
+The user has selected/focused on the input, then focused out of the input. The user has done some work on this field and then consideres it complete.
+- invalid
+This is where we have an error message and we need to display it in some sort of fashion.
+
+Therefore in our validation we can make use of the touched property like so: `{field.meta.touched ? field.meta.error : ''}`
+
+We can use ES6 destructuring like so:
+`const { meta: { touched, error } } = field;`, this allows us to pull off nested properties of objects. So we're essentially saying in the meta property of field, pull of the touched and error key-value pairs. 
