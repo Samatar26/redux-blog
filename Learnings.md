@@ -24,6 +24,8 @@ The other change is that it might make more sense to store our list of posts ins
 
 Lodash has a method called `_.mapKeys(array, object property)` which makes it really easy to turn an array of objects into an object where the keys are the postids. MapKeys' first argument expects an array and the second argument is the property we want to pull off of each object to use as the key of the resulting object.
 
+It also has a helper function called `_.map` which is useful when you're mapping through an object. In terms of performance, Object.keys is better than a for in. But neither beats a traditional for loop. So you could create an array of keys using `Object.keys(obj)` and loop through them using a for loop.
+
 ### Shortcut Action creator
 
 In the past we've made use of the connect helper by defining the mapDispatchToProps function whenever we wanted to get action creator directly into our component so we can call it of the props object.
@@ -37,3 +39,21 @@ export default connect(null, { fetchPosts })(PostsIndex);
 It is completely identical to the way we used to call it before with the mapDispatchToProps function. There are times you want to use the mapDispatchToProps, like when you want to do some computation on exactly how you want to call the action creator ahead of time. _**connect is taking care of that extra step of binding the dispatch function for us behind the scenes**_.
 
 We'll make use of the `componentDidMount` lifecycle method to fetch our posts. This function will automatically be called by React as soon as the component has been rendered to the DOM. You might wonder why we're fetching our data _after_ the component has mounted. Fetching data is an asynchronous operation, fetching data from an api takes some time and React will not wait for the operation to be finished to render the component. Even if we call it within `componentWillMount` the component will render before the data has been retrieved.
+
+### Fetch
+When making a fetch request, if all you're doing is getting some data you can just pass in the url which will return a promise of the response. You can then return another promise by manipulating that data by turning it into a json for example. With a post request you have to supply a second argument like the headers and body.
+
+```js
+const url = `http://reduxblog.herokuapp.com/api/posts?key=Samatar267`;
+fetch(url, {
+  method: 'post',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    title: 'Exams',
+    categories: 'Education',
+    content: 'Gotta study for it',
+  }),
+})
+  .then(reponse => reponse.json())
+  .then(data => console.log('Request succeeded with JSON response', data));
+```

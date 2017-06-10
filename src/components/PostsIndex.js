@@ -6,13 +6,35 @@ class PostsIndex extends Component {
   componentDidMount() {
     this.props.fetchPosts();
   }
+
+  renderPosts = () => {
+    //Performance wise best solution!
+    const postKeys = Object.keys(this.props.posts);
+    const posts = [];
+    for (var i = 0; i < postKeys.length; i++) {
+      posts.push(
+        <li>
+          {this.props.posts[postKeys[i]].title}
+        </li>
+      );
+    }
+    return posts;
+  };
+
   render() {
     return (
       <div>
-        Posts Index
+        <h3>Posts</h3>
+        <ul className="list-group">
+          {this.renderPosts()}
+        </ul>
       </div>
     );
   }
 }
 
-export default connect(null, { fetchPosts })(PostsIndex);
+function mapStateToProps({ posts }) {
+  return { posts };
+}
+
+export default connect(mapStateToProps, { fetchPosts })(PostsIndex);
