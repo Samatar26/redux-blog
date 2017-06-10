@@ -310,4 +310,47 @@ This is where we have an error message and we need to display it in some sort of
 Therefore in our validation we can make use of the touched property like so: `{field.meta.touched ? field.meta.error : ''}`
 
 We can use ES6 destructuring like so:
-`const { meta: { touched, error } } = field;`, this allows us to pull off nested properties of objects. So we're essentially saying in the meta property of field, pull of the touched and error key-value pairs. 
+`const { meta: { touched, error } } = field;`, this allows us to pull off nested properties of objects. So we're essentially saying in the meta property of field, pull of the touched and error key-value pairs.
+
+
+### Using Connect and Redux form
+We can still hook up the connect helper and combine the connect helper and the redux form helper. We wrap the connect helper around the component as usual and this returns a React Component, which is a valid input to Redux form.
+
+```js
+export default reduxForm({
+  validate,
+  form: 'PostsNewForm',
+})(
+  connect(null, { createPost })(PostsNew)
+);
+```
+
+### Navigation through callbacks
+To handle programatic navigation, react router passes in a big set of props into our component that's being rendered by a route. Whenever React Router renders a component, it passes in a whole bunch of different helpers and objects for helping with navigation to that component that's rendered by that route. The prop we're interested in is `this.props.history.push('/')`. If we call history with a route, whenever that piece of code is executed, we'll be automatically be navigated to that route. The big challenge is that we only want to navigate the user back to the list of posts page, after the post has been created. We dcan do this by passing in a callback to our action creator:
+
+```js
+onSubmit = values => {
+  this.props.createPost(values, () => {
+    this.props.history.push('/');
+  });
+};
+
+
+//Action creator
+export function createPost(values, cb) {
+  const request = fetch(`${ROOT_URL}/posts${API_KEY}`, {
+    method: 'post',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(values),
+  })
+    .then(response => response.json())
+    .then(data => cb());
+
+  return {
+    type: CREATE_POST,
+    payload: request,
+  };
+}
+
+
+```
