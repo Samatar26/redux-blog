@@ -9,7 +9,6 @@ class PostsShow extends Component {
   componentDidMount() {
     const { id } = this.props.match.params;
     this.props.fetchPost(id);
-    console.log(this.props);
   }
 
   onDeleteClick = () => {
@@ -22,7 +21,6 @@ class PostsShow extends Component {
   render() {
     const { post } = this.props;
     if (!post) {
-      console.log(this.props);
       return <div>Loading....</div>;
     }
     return (
@@ -43,7 +41,6 @@ class PostsShow extends Component {
 }
 
 const mapStateToProps = ({ posts }, ownProps) => {
-  console.log('dada', posts);
   return { post: posts[ownProps.match.params.id] };
 };
 export default connect(mapStateToProps, { fetchPost, deletePost })(PostsShow);

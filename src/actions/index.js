@@ -34,7 +34,6 @@ export function fetchPost(id) {
   const request = fetch(`${ROOT_URL}/posts/${id}${API_KEY}`).then(response =>
     response.json()
   );
-  console.log('action', request);
   return {
     type: FETCH_POST,
     payload: request,
