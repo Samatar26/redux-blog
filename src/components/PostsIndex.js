@@ -16,7 +16,9 @@ class PostsIndex extends Component {
       const post = this.props.posts;
       posts.push(
         <li className="list-group-item" key={post[postKeys[i]].id}>
-          {post[postKeys[i]].title}
+          <Link to={`/posts/${post[postKeys[i]].id}`}>
+            {post[postKeys[i]].title}
+          </Link>
         </li>
       );
     }
